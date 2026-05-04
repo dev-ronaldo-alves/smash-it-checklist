@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <link rel="icon" type="image/svg+xml" href="https://emojicdn.elk.sh/✅">
+    <title>Smash It - Fechamento de Loja | Checklist Diário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg-gradient-start: #0b0b0b;
+            --bg-gradient-end: #000000;
+            --text-primary: #f1f5f9;
+            --card-bg: rgba(15, 15, 20, 0.7);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --input-bg: rgba(0, 0, 0, 0.4);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --header-bg: rgba(0, 0, 0, 0.9);
+            --footer-gradient: linear-gradient(to top, black, rgba(0,0,0,0.95), transparent);
+            --modal-bg: rgba(0, 0, 0, 0.92);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-hover: 0 12px 24px -8px rgba(0,0,0,0.3);
+        }
+        
+        body.light-theme {
+            --bg-gradient-start: #fef9e8;
+            --bg-gradient-end: #fff4e0;
+            --text-primary: #1e1b1a;
+            --card-bg: rgba(255, 248, 235, 0.85);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --input-border: rgba(0, 0, 0, 0.15);
+            --header-bg: rgba(255, 248, 235, 0.95);
+            --footer-gradient: linear-gradient(to top, #fff4e0, rgba(255,244,224,0.95), transparent);
+            --modal-bg: rgba(255, 248, 235, 0.98);
+            --shadow-hover: 0 12px 24px -8px rgba(0,0,0,0.15);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 10% 20%, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            transition: background 0.2s ease, color 0.2s ease;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* PRELOADER */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+            backdrop-filter: blur(2px);
+        }
+        body.light-theme #preloader {
+            background: #fff8ec;
+        }
+        .preloader-content {
+            text-align: center;
+            padding: 2rem;
+            animation: fadeSlideUp 0.6s ease-out;
+        }
+        .check-icon {
+            font-size: 5rem;
+            display: inline-block;
+            animation: bounceCheck 0.9s infinite alternate ease-in-out;
+            filter: drop-shadow(0 8px 12px rgba(16,185,129,0.3));
+        }
+        .preloader-title {
+            font-size: 2.8rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 3px;
+        }
+        .progress-container {
+            width: 280px;
+            max-width: 70vw;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            margin: 1.8rem auto 0.5rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 20px;
+            animation: fillProgress 2.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+        }
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            40% { width: 45%; }
+            70% { width: 80%; }
+            100% { width: 100%; }
+        }
+        @keyframes bounceCheck {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-12px) scale(1.05); }
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.5); border-radius: 10px; }
+        
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        @media (min-width: 640px) { .app-container { max-width: 640px; } }
+        @media (min-width: 768px) { .app-container { max-width: 768px; } }
+        @media (min-width: 1024px) { .app-container { max-width: 1024px; } }
+        
+        .brand-font { font-family: 'Bangers', cursive; letter-spacing: 2px; text-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+        .card-glass { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1); }
+        .card-glass:hover { border-color: rgba(16, 185, 129, 0.5); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+        
+        .btn-primary { background: linear-gradient(105deg, #10b981 0%, #059669 100%); color: white; font-weight: 800; transition: transform 0.15s; box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.2); }
+        .btn-primary:active { transform: scale(0.97); }
+        
+        .btn-whatsapp { background: linear-gradient(105deg, #25D366 0%, #128C7E 100%); box-shadow: 0 8px 20px -6px rgba(37, 211, 102, 0.3); }
+        .btn-whatsapp:active { transform: scale(0.98); }
+        
+        .modal { display: none; position: fixed; inset: 0; background: var(--modal-bg); backdrop-filter: blur(10px); z-index: 200; align-items: center; justify-content: center; }
+        .modal.active { display: flex; animation: modalFade 0.25s ease-out; }
+        @keyframes modalFade { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(10px);} }
+        
+        .animate-in { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(16,185,129,0.5);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+        }
+        .task-checkbox.checked {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        .task-checkbox i { font-size: 12px; opacity: 0; }
+        .task-checkbox.checked i { opacity: 1; }
+        
+        .management-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .management-buttons button {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-management-primary { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .btn-management-primary:hover { background: rgba(16,185,129,0.3); }
+        .btn-management-danger { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        
+        .progress-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 30px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.3s ease;
+        }
+        
+        .edit-active { background: #10b981 !important; color: white !important; transform: rotate(90deg); }
+        
+        .photo-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 2px solid rgba(16,185,129,0.4);
+            transition: transform 0.2s;
+        }
+        .photo-preview:hover { transform: scale(1.02); border-color: #10b981; }
+        .remove-photo {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .share-loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen pb-32 antialiased">
+
+<div id="preloader">
+    <div class="preloader-content">
+        <div class="check-icon">✅</div>
+        <div class="preloader-title brand-font">SMASH IT</div>
+        <div class="progress-container"><div class="progress-fill"></div></div>
+        <div class="preloader-sub"><i class="fas fa-camera"></i> Checklist Diário</div>
+    </div>
+</div>
+
+<header class="sticky top-0 z-50 backdrop-blur-2xl border-b border-white/10 shadow-lg" style="background: var(--header-bg);">
+    <div class="app-container px-4 pt-5 pb-3">
+        <div class="flex justify-between items-center flex-wrap gap-2 mb-2">
+            <div class="flex items-baseline gap-2">
+                <h1 class="text-3xl sm:text-4xl btn-primary px-3 py-1 rounded-2xl shadow-md brand-font tracking-wider">SMASH IT</h1>
+                <span class="text-[10px] font-bold text-emerald-500/80 uppercase">checklist + fotos</span>
+            </div>
+        </div>
+        <div class="button-row flex justify-center gap-3 my-2 flex-wrap">
+            <button onclick="redirectToCounter()" title="Contador de Stock" class="bg-emerald-500/20 hover:bg-emerald-500/40 w-12 h-12 rounded-full"><i class="fas fa-exchange-alt"></i></button>
+            <button id="btn-theme-toggle" onclick="toggleTheme()" title="Alternar tema"><i id="theme-icon" class="fas fa-moon"></i></button>
+            <button id="btn-edit-mode" onclick="toggleEditMode()" title="Modo gestão de tarefas"><i class="fas fa-cog"></i></button>
+            <button onclick="resetDailyChecklist()" title="Resetar checkboxes (novo dia)" class="relative"><i class="fas fa-undo-alt"></i></button>
+        </div>
+        <div class="mt-3 flex flex-col sm:flex-row gap-2">
+            <div class="flex-1">
+                <label class="text-[10px] text-gray-400 uppercase tracking-wider">Responsável pelo fechamento</label>
+                <input type="text" id="responsavel-nome" placeholder="Ex: Ana Silva, João Santos..." class="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-2xl outline-none text-sm focus:border-emerald-500" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
+            </div>
+            <div class="w-full sm:w-40">
+                <label class="text-[10px] text-gray-400 uppercase tracking-wider">Data / Hora</label>
+                <input type="text" id="data-hora" readonly class="w-full bg-white/5 border border-white/10 h-12 px-4 rounded-2xl text-sm" style="background: var(--input-bg); color: var(--text-primary);">
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="app-container px-4 py-5 space-y-6">
+    <div id="management-zone" class="hidden animate-in bg-emerald-500/5 border border-emerald-500/25 rounded-3xl p-5">
+        <div class="flex items-center gap-2 mb-3"><i class="fas fa-tasks text-emerald-400"></i><h3 class="text-emerald-400 text-[11px] font-black uppercase tracking-wider">GESTÃO DE TAREFAS</h3></div>
+        <button onclick="openTaskModal()" class="w-full bg-emerald-500 text-white font-extrabold py-3.5 rounded-xl text-xs uppercase flex items-center justify-center gap-2 shadow-md"><i class="fas fa-plus-circle"></i> Adicionar nova tarefa</button>
+        <div class="management-buttons">
+            <button onclick="confirmResetTasks()" class="btn-management-danger"><i class="fas fa-arrow-rotate-left"></i> Restaurar tarefas padrão</button>
+        </div>
+        <p class="text-[10px] text-gray-400 text-center mt-4">✦ Gerencie as tarefas do fechamento diário</p>
+    </div>
+
+    <!-- Painel de progresso -->
+    <div class="card-glass rounded-2xl p-4">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400"><i class="fas fa-chart-simple mr-1"></i> Progresso do fechamento</span>
+            <span id="progress-percent" class="text-sm font-black text-emerald-400">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div id="progress-fill-bar" class="progress-bar-fill" style="width: 0%"></div></div>
+        <div class="flex justify-between text-[10px] text-gray-400 mt-1"><span>0 concluídas</span><span id="total-tasks-count">0</span></div>
+    </div>
+
+    <!-- Lista de tarefas (checklist) -->
+    <div id="tasks-container" class="space-y-3"></div>
+
+    <!-- Módulo de Fotos Anexadas -->
+    <div class="card-glass rounded-3xl p-5">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+            <div class="flex items-center gap-2"><i class="fas fa-camera text-emerald-400 text-sm"></i><label class="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-400">Fotos do Fechamento</label></div>
+            <button onclick="clearAllPhotos()" class="text-xs text-red-400 bg-red-400/20 px-3 py-1 rounded-full"><i class="fas fa-trash-alt mr-1"></i>Limpar todas</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-3">
+            <label class="btn-primary text-xs py-2 px-4 rounded-xl cursor-pointer inline-flex items-center gap-2"><i class="fas fa-plus-circle"></i> Adicionar fotos<input type="file" id="photo-input" accept="image/*" multiple class="hidden" onchange="handlePhotoSelection(event)"></label>
+            <button onclick="takePhotoFromCamera()" class="btn-primary text-xs py-2 px-4 rounded-xl inline-flex items-center gap-2"><i class="fas fa-camera"></i> Tirar foto</button>
+            <span class="text-[10px] text-gray-400 self-center">Máx. 8 fotos</span>
+        </div>
+        <div id="photos-preview-container" class="flex flex-wrap gap-3 mt-2"></div>
+    </div>
+
+    <!-- Observações adicionais -->
+    <div class="card-glass rounded-3xl p-5">
+        <div class="flex items-center gap-3 mb-2"><i class="fas fa-pen text-emerald-400 text-sm"></i><label class="font-bold uppercase text-[10px] tracking-[0.2em] text-gray-400">Observações do fechamento</label></div>
+        <textarea id="obs-geral" rows="3" oninput="saveObs()" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 focus:border-emerald-500/60 outline-none text-sm resize-none" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" placeholder="📝 Qualquer informação relevante: ocorrências, valores em caixa, chaves, alarme..."></textarea>
+    </div>
+
+    <!-- NOVO: Botão de envio via WhatsApp com fotos e checklist -->
+    <div class="card-glass rounded-3xl p-5 border-2 border-emerald-500/40 bg-gradient-to-r from-emerald-500/5 to-transparent">
+        <div class="flex items-center gap-3 mb-2"><i class="fab fa-whatsapp text-2xl text-green-500"></i><label class="font-bold uppercase text-xs tracking-[0.2em] text-emerald-400">Enviar checklist</label></div>
+        <p class="text-[11px] text-gray-400 mb-3">Envie o checklist via WhatsApp. O app irá gerar um resumo + imagens.</p>
+        <button id="whatsapp-share-btn" onclick="shareChecklistOnWhatsApp()" class="w-full btn-whatsapp py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-3 transition-all"><i class="fab fa-whatsapp text-xl"></i> Enviar Checklist</button>
+        <div id="share-status-msg" class="text-[10px] text-center text-gray-400 mt-2 hidden"></div>
+    </div>
+</main>
+
+<!-- Modal genérico -->
+<div id="modal-container" class="modal px-5">
+    <div class="card-glass p-6 rounded-[2.5rem] w-full max-w-sm border border-emerald-500/30">
+        <div class="text-center mb-2"><h3 id="modal-title" class="text-2xl font-black text-emerald-500 brand-font">Ação</h3><div class="w-12 h-0.5 bg-emerald-500/50 mx-auto mt-1"></div></div>
+        <div id="modal-content" class="space-y-5 my-4"></div>
+        <div class="flex gap-3 mt-4"><button onclick="closeModal()" class="flex-1 h-12 bg-white/10 rounded-xl font-bold text-gray-300 text-xs">Cancelar</button><button id="modal-confirm" class="flex-1 btn-primary h-12 rounded-xl font-bold text-xs">Confirmar</button></div>
+    </div>
+</div>
+
+<script>
+    // TAREFAS PADRÃO
+    const DEFAULT_TASKS = [
+        { id: 1, text: "✔️ Conferir cozinha de produção (geladeiras, luzes e ar-condicionado)", checked: false },
+        { id: 3, text: "🧹 Limpeza geral da copa e cozinha", checked: false },
+        { id: 4, text: "❄️ Desligar equipamentos (fritadeiras, chapas, exaustor)", checked: false },
+        {id: 5, text: "🔥 Fechar Válvulas de gás das chapas e fritadeiras", checked: false },
+        { id: 6, text: "📦 Embalar, verificar validades e guardar perecíveis", checked: false },
+        { id: 7, text: "🗑️ Recolher lixo e separar recicláveis", checked: false },
+        { id: 8, text: "📝 Enviar contagem de loja (itens críticos)", checked: false },
+        { id: 9, text: "🔌 Desligar luzes e ar condicionado", checked: false },
+        { id: 10, text: "🔒 Fechar portas e janelas / ativar alarme", checked: false },
+    ];
+    
+    let tasks = [];
+    let isEditMode = false;
+    let attachedPhotos = []; // array de { dataURL, name }
+    
+    function loadData() {
+        const stored = localStorage.getItem('smash_checklist_tasks');
+        if (stored) tasks = JSON.parse(stored);
+        else tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+        
+        const storedResp = localStorage.getItem('smash_responsavel');
+        if (storedResp) document.getElementById('responsavel-nome').value = storedResp;
+        const storedObs = localStorage.getItem('smash_obs_geral');
+        if (storedObs) document.getElementById('obs-geral').value = storedObs;
+        
+        const storedPhotos = localStorage.getItem('smash_photos');
+        if (storedPhotos) {
+            try {
+                attachedPhotos = JSON.parse(storedPhotos);
+                renderPhotoPreviews();
+            } catch(e) {}
+        }
+        updateDateTime();
+    }
+    
+    function persistTasks() {
+        localStorage.setItem('smash_checklist_tasks', JSON.stringify(tasks));
+        localStorage.setItem('smash_responsavel', document.getElementById('responsavel-nome').value);
+    }
+    function saveObs() {
+        localStorage.setItem('smash_obs_geral', document.getElementById('obs-geral').value);
+    }
+    function savePhotos() {
+        localStorage.setItem('smash_photos', JSON.stringify(attachedPhotos));
+    }
+    
+    function updateDateTime() {
+        const now = new Date();
+        const dataFormatada = now.toLocaleDateString('pt-PT');
+        const horaMinutos = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('data-hora').value = `${dataFormatada} ${horaMinutos}`;
+    }
+    setInterval(updateDateTime, 60000);
+    
+    function toggleTaskCheck(taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) { task.checked = !task.checked; persistTasks(); renderTasks(); }
+    }
+    
+    function updateProgress() {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.checked).length;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        document.getElementById('progress-percent').innerText = `${percent}%`;
+        document.getElementById('progress-fill-bar').style.width = `${percent}%`;
+        document.getElementById('total-tasks-count').innerText = total;
+        const completedSpan = document.querySelector('.flex.justify-between.text-\\[10px\\] .text-gray-400 span:first-child');
+        if(completedSpan) completedSpan.innerText = `${completed} concluídas`;
+    }
+    
+    function renderTasks() {
+        const container = document.getElementById('tasks-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (tasks.length === 0) {
+            container.innerHTML = `<div class="text-center py-12 text-gray-400 card-glass rounded-3xl p-8"><i class="fas fa-clipboard-empty text-4xl mb-3"></i><p>Nenhuma tarefa cadastrada.</p><button onclick="openTaskModal()" class="mt-3 text-emerald-400 underline">Adicionar tarefa</button></div>`;
+            updateProgress(); return;
+        }
+        tasks.forEach(task => {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'card-glass p-4 rounded-2xl flex items-start gap-3 transition-all';
+            const isChecked = task.checked;
+            taskDiv.innerHTML = `
+                <div class="task-checkbox ${isChecked ? 'checked' : ''}" onclick="toggleTaskCheck(${task.id})">
+                    <i class="fas fa-check text-white text-[10px]"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        <span class="text-sm font-medium ${isChecked ? 'line-through text-gray-400' : ''}">${escapeHtml(task.text)}</span>
+                        ${isEditMode ? `<div class="flex gap-2"><button onclick="openTaskModal(${task.id})" class="text-blue-400 text-xs"><i class="fas fa-pen"></i></button><button onclick="confirmDeleteTask(${task.id})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button></div>` : ''}
+                    </div>
+                </div>
+            `;
+            container.appendChild(taskDiv);
+        });
+        updateProgress();
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    
+    function openTaskModal(taskId = null) {
+        const task = taskId ? tasks.find(t => t.id === taskId) : null;
+        document.getElementById('modal-title').innerText = task ? '✏️ Editar Tarefa' : '➕ Nova Tarefa';
+        document.getElementById('modal-content').innerHTML = `<input type="text" id="task-text-input" value="${task ? escapeHtml(task.text) : ''}" class="w-full h-14 bg-black/40 border border-white/15 px-5 rounded-xl text-white" placeholder="Ex: Conferir estoque de bebidas">`;
+        document.getElementById('modal-confirm').onclick = () => {
+            let newText = document.getElementById('task-text-input').value.trim();
+            if (!newText) return;
+            if (task) task.text = newText;
+            else tasks.push({ id: Date.now(), text: newText, checked: false });
+            persistTasks(); renderTasks(); closeModal();
+        };
+        openModal();
+    }
+    
+    function confirmDeleteTask(taskId) {
+        document.getElementById('modal-title').innerText = '⚠️ Remover Tarefa';
+        document.getElementById('modal-content').innerHTML = `<p class="text-center">Deseja excluir esta tarefa permanentemente?</p>`;
+        document.getElementById('modal-confirm').onclick = () => {
+            tasks = tasks.filter(t => t.id !== taskId);
+            persistTasks(); renderTasks(); closeModal();
+        };
+        openModal();
+    }
+    
+    function resetDailyChecklist() {
+        document.getElementById('modal-title').innerText = '🔄 Reset diário';
+        document.getElementById('modal-content').innerHTML = `<p>Desmarcar todas as tarefas para um novo dia?<br><span class="text-xs text-gray-400">O responsável, fotos e observações serão mantidos.</span></p>`;
+        document.getElementById('modal-confirm').onclick = () => {
+            tasks.forEach(t => t.checked = false);
+            persistTasks(); renderTasks(); closeModal();
+        };
+        openModal();
+    }
+    
+    function confirmResetTasks() {
+        document.getElementById('modal-title').innerText = '⚠️ Restaurar Padrão';
+        document.getElementById('modal-content').innerHTML = `<p>Isso irá substituir todas as tarefas pela lista original. Tarefas personalizadas serão perdidas. Continuar?</p>`;
+        document.getElementById('modal-confirm').onclick = () => {
+            tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+            persistTasks(); renderTasks(); closeModal();
+        };
+        openModal();
+    }
+    
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const btn = document.getElementById('btn-edit-mode');
+        if (btn) btn.classList.toggle('edit-active');
+        document.getElementById('management-zone').classList.toggle('hidden');
+        renderTasks();
+    }
+    
+    // Módulo de Fotos
+    function handlePhotoSelection(event) {
+        const files = Array.from(event.target.files);
+        if (attachedPhotos.length + files.length > 8) {
+            alert("Máximo de 8 fotos permitidas. Remova alguma antes de adicionar.");
+            return;
+        }
+        files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    attachedPhotos.push({ dataURL: e.target.result, name: file.name });
+                    savePhotos();
+                    renderPhotoPreviews();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        document.getElementById('photo-input').value = '';
+    }
+    
+    function takePhotoFromCamera() {
+        const cameraInput = document.createElement('input');
+        cameraInput.type = 'file';
+        cameraInput.accept = 'image/*';
+        cameraInput.capture = 'environment';
+        cameraInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (attachedPhotos.length >= 8) {
+                alert("Máximo de 8 fotos atingido. Remova alguma antes de adicionar.");
+                return;
+            }
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    attachedPhotos.push({ dataURL: ev.target.result, name: file.name || `foto_${Date.now()}.jpg` });
+                    savePhotos();
+                    renderPhotoPreviews();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        cameraInput.click();
+    }
+    
+    function renderPhotoPreviews() {
+        const container = document.getElementById('photos-preview-container');
+        if (!container) return;
+        container.innerHTML = '';
+        attachedPhotos.forEach((photo, idx) => {
+            const div = document.createElement('div');
+            div.className = 'relative inline-block';
+            div.innerHTML = `
+                <img src="${photo.dataURL}" class="photo-preview w-20 h-20 object-cover rounded-xl border border-emerald-400/30">
+                <div class="remove-photo" onclick="removePhoto(${idx})"><i class="fas fa-times text-white text-[8px]"></i></div>
+            `;
+            container.appendChild(div);
+        });
+        if (attachedPhotos.length === 0) container.innerHTML = '<div class="text-gray-500 text-xs p-2">Nenhuma foto anexada.</div>';
+    }
+    
+    function removePhoto(index) {
+        attachedPhotos.splice(index, 1);
+        savePhotos();
+        renderPhotoPreviews();
+    }
+    
+    function clearAllPhotos() {
+        attachedPhotos = [];
+        savePhotos();
+        renderPhotoPreviews();
+    }
+    
+    // ============= NOVA FUNÇÃO: ENVIAR CHECKLIST + FOTOS VIA WHATSAPP =============
+    async function shareChecklistOnWhatsApp() {
+        const shareBtn = document.getElementById('whatsapp-share-btn');
+        const originalHtml = shareBtn.innerHTML;
+        shareBtn.disabled = true;
+        shareBtn.innerHTML = '<span class="share-loader"></span> Preparando partilha...';
+        const statusDiv = document.getElementById('share-status-msg');
+        statusDiv.classList.add('hidden');
+        
+        try {
+            // construir relatório formatado
+            const responsavel = document.getElementById('responsavel-nome').value.trim() || "Não informado";
+            const dataHora = document.getElementById('data-hora').value || new Date().toLocaleString('pt-PT');
+            const observacoes = document.getElementById('obs-geral').value.trim() || "Nenhuma observação adicional.";
+            const totalTarefas = tasks.length;
+            const concluidas = tasks.filter(t => t.checked).length;
+            const percentual = totalTarefas === 0 ? 0 : Math.round((concluidas / totalTarefas) * 100);
+            
+            let tasksList = "";
+            tasks.forEach(task => {
+                const statusIcon = task.checked ? "✅" : "❌";
+                tasksList += `${statusIcon} ${task.text}\n`;
+            });
+            
+            let message = `🏢 *SMASH IT - Fechamento de Loja*\n`;
+            message += `📅 *Data/Hora:* ${dataHora}\n`;
+            message += `👤 *Responsável:* ${responsavel}\n`;
+            message += `📊 *Progresso:* ${concluidas}/${totalTarefas} (${percentual}%)\n\n`;
+            message += `📋 *CHECKLIST:*\n${tasksList}\n`;
+            message += `📝 *Observações:* ${observacoes}\n`;
+            message += `📸 *Total de fotos anexadas:* ${attachedPhotos.length}\n`;
+            message += `\n🔒 Relatório gerado automaticamente via Smash It.`;
+            
+            // Caso não tenha fotos, apenas envia mensagem via WhatsApp
+            if (attachedPhotos.length === 0) {
+                const encodedMsg = encodeURIComponent(message);
+                window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+                shareBtn.disabled = false;
+                shareBtn.innerHTML = originalHtml;
+                statusDiv.classList.remove('hidden');
+                statusDiv.innerText = "✓ Mensagem enviada! (nenhuma foto anexada)";
+                setTimeout(() => statusDiv.classList.add('hidden'), 3000);
+                return;
+            }
+            
+            // Tentar partilha nativa com fotos (Web Share API)
+            if (navigator.share && navigator.canShare && attachedPhotos.length > 0) {
+                // Converter dataURLs para arquivos File
+                const imageFiles = [];
+                for (let i = 0; i < attachedPhotos.length; i++) {
+                    const photo = attachedPhotos[i];
+                    const blob = await (await fetch(photo.dataURL)).blob();
+                    const fileName = photo.name || `foto_checklist_${i+1}.jpg`;
+                    const file = new File([blob], fileName, { type: blob.type });
+                    imageFiles.push(file);
+                }
+                const shareData = {
+                    title: 'Smash It - Checklist Fechamento',
+                    text: message,
+                    files: imageFiles,
+                };
+                if (navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+                    statusDiv.classList.remove('hidden');
+                    statusDiv.innerText = "✓ Checklist e fotos enviados com sucesso!";
+                    setTimeout(() => statusDiv.classList.add('hidden'), 3000);
+                } else {
+                    throw new Error("cannot share files");
+                }
+            } else {
+                // Fallback: abre WhatsApp com texto + alerta para enviar fotos manualmente
+                const encodedMsg = encodeURIComponent(message + `\n\n⚠️ ATENÇÃO: Existem ${attachedPhotos.length} fotos anexadas no sistema. Após enviar esta mensagem, compartilhe as imagens manualmente no chat.`);
+                window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+                statusDiv.classList.remove('hidden');
+                statusDiv.innerText = `ℹ️ Mensagem enviada! Envie as ${attachedPhotos.length} foto(s) manualmente no WhatsApp.`;
+                setTimeout(() => statusDiv.classList.add('hidden'), 5000);
+            }
+        } catch (err) {
+            console.error("Erro ao partilhar:", err);
+            statusDiv.classList.remove('hidden');
+            statusDiv.innerText = "❌ Não foi possível partilhar automaticamente. Tente novamente ou use o envio manual.";
+            setTimeout(() => statusDiv.classList.add('hidden'), 4000);
+        } finally {
+            shareBtn.disabled = false;
+            shareBtn.innerHTML = originalHtml;
+        }
+    }
+    
+    function openModal() { document.getElementById('modal-container').classList.add('active'); }
+    function closeModal() { document.getElementById('modal-container').classList.remove('active'); }
+    
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        let icon = document.getElementById('theme-icon');
+        let isLight = document.body.classList.contains('light-theme');
+        icon.className = isLight ? 'fas fa-sun text-base' : 'fas fa-moon text-base';
+        localStorage.setItem('smash_checklist_theme', isLight ? 'light' : 'dark');
+    }
+    function loadTheme() {
+        let saved = localStorage.getItem('smash_checklist_theme');
+        if (saved === 'light') { document.body.classList.add('light-theme'); document.getElementById('theme-icon').className = 'fas fa-sun text-base'; }
+    }
+    
+    function redirectToCounter() {
+        window.location.href = "https://dev-ronaldo-alves.github.io/smash-it-pro-contagem/";
+    }
+    
+    document.getElementById('responsavel-nome')?.addEventListener('input', () => persistTasks());
+    document.getElementById('obs-geral')?.addEventListener('input', () => saveObs());
+    
+    window.addEventListener('load', () => {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            const startTime = performance.now();
+            const remaining = () => Math.max(0, 3000 - (performance.now() - startTime));
+            const hide = () => { preloader.style.opacity = '0'; setTimeout(() => preloader.style.display = 'none', 600); };
+            const delay = remaining();
+            if (delay <= 0) hide(); else setTimeout(hide, delay);
+        }
+        loadData(); loadTheme(); renderTasks();
+    });
+</script>
+</body>
+</html>
