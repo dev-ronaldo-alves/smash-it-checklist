@@ -346,9 +346,10 @@
     // TAREFAS PADRÃO
     const DEFAULT_TASKS = [
         { id: 1, text: "✔️ Conferir cozinha de produção (geladeiras, luzes e ar-condicionado)", checked: false },
-        { id: 3, text: "🧹 Limpeza geral da copa e cozinha", checked: false },
-        { id: 4, text: "❄️ Desligar equipamentos (fritadeiras, chapas, exaustor)", checked: false },
-        {id: 5, text: "🔥 Fechar Válvulas de gás das chapas e fritadeiras", checked: false },
+        { id: 2, text: "🧹 Limpeza geral da copa e cozinha", checked: false },
+        { id: 3, text: "❄️ Desligar equipamentos (fritadeiras, chapas, exaustor)", checked: false },
+        {id: 4, text: "🔥 Fechar válvulas de gás das chapas e fritadeiras", checked: false },
+        {id:5, text: "🔌 Conferir tomadas dos equipamentos", checked: false },
         { id: 6, text: "📦 Embalar, verificar validades e guardar perecíveis", checked: false },
         { id: 7, text: "🗑️ Recolher lixo e separar recicláveis", checked: false },
         { id: 8, text: "📝 Enviar contagem de loja (itens críticos)", checked: false },
@@ -571,17 +572,17 @@
         renderPhotoPreviews();
     }
     
-    // ============= NOVA FUNÇÃO: ENVIAR CHECKLIST + FOTOS VIA WHATSAPP =============
+    // ============= FUNÇÃO REFORMULADA: REDIRECIONAMENTO DIRETO PARA WHATSAPP APP =============
     async function shareChecklistOnWhatsApp() {
         const shareBtn = document.getElementById('whatsapp-share-btn');
         const originalHtml = shareBtn.innerHTML;
         shareBtn.disabled = true;
-        shareBtn.innerHTML = '<span class="share-loader"></span> Preparando partilha...';
+        shareBtn.innerHTML = '<span class="share-loader"></span> A abrir WhatsApp...';
         const statusDiv = document.getElementById('share-status-msg');
         statusDiv.classList.add('hidden');
         
         try {
-            // construir relatório formatado
+            // montar relatório igual ao anterior
             const responsavel = document.getElementById('responsavel-nome').value.trim() || "Não informado";
             const dataHora = document.getElementById('data-hora').value || new Date().toLocaleString('pt-PT');
             const observacoes = document.getElementById('obs-geral').value.trim() || "Nenhuma observação adicional.";
@@ -602,56 +603,43 @@
             message += `📋 *CHECKLIST:*\n${tasksList}\n`;
             message += `📝 *Observações:* ${observacoes}\n`;
             message += `📸 *Total de fotos anexadas:* ${attachedPhotos.length}\n`;
-            message += `\n🔒 Relatório gerado automaticamente via Smash It.`;
+            message += `\n🔒 Relatório gerado automaticamente via Smash Checklist.`;
             
-            // Caso não tenha fotos, apenas envia mensagem via WhatsApp
-            if (attachedPhotos.length === 0) {
-                const encodedMsg = encodeURIComponent(message);
-                window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
-                shareBtn.disabled = false;
-                shareBtn.innerHTML = originalHtml;
-                statusDiv.classList.remove('hidden');
-                statusDiv.innerText = "✓ Mensagem enviada! (nenhuma foto anexada)";
-                setTimeout(() => statusDiv.classList.add('hidden'), 3000);
-                return;
+            // Adicionar aviso sobre as fotos (já que o link direto não envia imagens automaticamente)
+            if (attachedPhotos.length > 0) {
+                message += `\n\n⚠️ *Importante:* Existem ${attachedPhotos.length} foto(s) anexadas no sistema. Por favor, envie-as manualmente após abrir o chat.`;
             }
             
-            // Tentar partilha nativa com fotos (Web Share API)
-            if (navigator.share && navigator.canShare && attachedPhotos.length > 0) {
-                // Converter dataURLs para arquivos File
-                const imageFiles = [];
-                for (let i = 0; i < attachedPhotos.length; i++) {
-                    const photo = attachedPhotos[i];
-                    const blob = await (await fetch(photo.dataURL)).blob();
-                    const fileName = photo.name || `foto_checklist_${i+1}.jpg`;
-                    const file = new File([blob], fileName, { type: blob.type });
-                    imageFiles.push(file);
-                }
-                const shareData = {
-                    title: 'Smash It - Checklist Fechamento',
-                    text: message,
-                    files: imageFiles,
-                };
-                if (navigator.canShare(shareData)) {
-                    await navigator.share(shareData);
-                    statusDiv.classList.remove('hidden');
-                    statusDiv.innerText = "✓ Checklist e fotos enviados com sucesso!";
-                    setTimeout(() => statusDiv.classList.add('hidden'), 3000);
-                } else {
-                    throw new Error("cannot share files");
-                }
+            const encodedMsg = encodeURIComponent(message);
+            
+            // Detectar dispositivo móvel para usar deep link direto (whatsapp://) que abre o aplicativo sem passar pelo browser
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|Windows Phone|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+            let whatsappUrl;
+            
+            if (isMobile) {
+                // Deep link que força abertura direta do aplicativo WhatsApp (sem passar pelo browser)
+                whatsappUrl = `whatsapp://send?text=${encodedMsg}`;
             } else {
-                // Fallback: abre WhatsApp com texto + alerta para enviar fotos manualmente
-                const encodedMsg = encodeURIComponent(message + `\n\n⚠️ ATENÇÃO: Existem ${attachedPhotos.length} fotos anexadas no sistema. Após enviar esta mensagem, compartilhe as imagens manualmente no chat.`);
-                window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
-                statusDiv.classList.remove('hidden');
-                statusDiv.innerText = `ℹ️ Mensagem enviada! Envie as ${attachedPhotos.length} foto(s) manualmente no WhatsApp.`;
-                setTimeout(() => statusDiv.classList.add('hidden'), 5000);
+                // Em desktop, usar wa.me que redireciona para WhatsApp Web ou aplicativo (se integrado)
+                whatsappUrl = `https://wa.me/?text=${encodedMsg}`;
             }
-        } catch (err) {
-            console.error("Erro ao partilhar:", err);
+            
+            // Redirecionar diretamente
+            window.open(whatsappUrl, '_blank');
+            
+            // Pequeno delay para exibir mensagem de sucesso, mas sem bloquear
             statusDiv.classList.remove('hidden');
-            statusDiv.innerText = "❌ Não foi possível partilhar automaticamente. Tente novamente ou use o envio manual.";
+            if (attachedPhotos.length > 0) {
+                statusDiv.innerText = `✓ WhatsApp aberto! Envie as ${attachedPhotos.length} foto(s) manualmente no chat.`;
+            } else {
+                statusDiv.innerText = "✓ Checklist enviado! O WhatsApp foi aberto com o resumo.";
+            }
+            setTimeout(() => statusDiv.classList.add('hidden'), 5000);
+            
+        } catch (err) {
+            console.error("Erro ao abrir WhatsApp:", err);
+            statusDiv.classList.remove('hidden');
+            statusDiv.innerText = "❌ Não foi possível abrir o WhatsApp. Verifique se o aplicativo está instalado.";
             setTimeout(() => statusDiv.classList.add('hidden'), 4000);
         } finally {
             shareBtn.disabled = false;
