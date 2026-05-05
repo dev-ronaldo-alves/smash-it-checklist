@@ -27,6 +27,8 @@
             --modal-bg: rgba(0, 0, 0, 0.92);
             --shadow-sm: 0 4px 12px rgba(0,0,0,0.1);
             --shadow-hover: 0 12px 24px -8px rgba(0,0,0,0.3);
+            --icon-btn-bg: rgba(255, 255, 255, 0.08);
+            --icon-btn-border: rgba(255, 255, 255, 0.25);
         }
         
         body.light-theme {
@@ -41,6 +43,8 @@
             --footer-gradient: linear-gradient(to top, #fff4e0, rgba(255,244,224,0.95), transparent);
             --modal-bg: rgba(255, 248, 235, 0.98);
             --shadow-hover: 0 12px 24px -8px rgba(0,0,0,0.15);
+            --icon-btn-bg: rgba(0, 0, 0, 0.05);
+            --icon-btn-border: rgba(0, 0, 0, 0.2);
         }
         
         body {
@@ -50,6 +54,38 @@
             transition: background 0.2s ease, color 0.2s ease;
             margin: 0;
             padding: 0;
+        }
+        
+        /* Ícones com contorno (borda) igual ao do botão de alternar */
+        .icon-btn {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--icon-btn-bg);
+            border: 1.5px solid var(--icon-btn-border);
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: currentColor;
+        }
+        .icon-btn:hover {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: #10b981;
+            transform: translateY(-2px);
+        }
+        .icon-btn:active {
+            transform: scale(0.94);
+        }
+        /* Estilo especial para modo edição ativo (mantém contorno visível) */
+        .edit-active {
+            background: #10b981 !important;
+            color: white !important;
+            border-color: #10b981 !important;
+            transform: rotate(90deg);
         }
         
         /* PRELOADER */
@@ -204,8 +240,6 @@
             transition: width 0.3s ease;
         }
         
-        .edit-active { background: #10b981 !important; color: white !important; transform: rotate(90deg); }
-        
         .photo-preview {
             width: 80px;
             height: 80px;
@@ -264,9 +298,10 @@
         </div>
         <div class="button-row flex justify-center gap-3 my-2 flex-wrap">
             <button onclick="redirectToCounter()" title="Contador de Stock" class="bg-emerald-500/20 hover:bg-emerald-500/40 w-12 h-12 rounded-full"><i class="fas fa-exchange-alt"></i></button>
-            <button id="btn-theme-toggle" onclick="toggleTheme()" title="Alternar tema"><i id="theme-icon" class="fas fa-moon"></i></button>
-            <button id="btn-edit-mode" onclick="toggleEditMode()" title="Modo gestão de tarefas"><i class="fas fa-cog"></i></button>
-            <button onclick="resetDailyChecklist()" title="Resetar checkboxes (novo dia)" class="relative"><i class="fas fa-undo-alt"></i></button>
+            <!-- Botões com contorno (borda) igual ao de alternar -->
+            <button id="btn-theme-toggle" onclick="toggleTheme()" title="Alternar tema" class="icon-btn"><i id="theme-icon" class="fas fa-moon"></i></button>
+            <button id="btn-edit-mode" onclick="toggleEditMode()" title="Modo gestão de tarefas" class="icon-btn"><i class="fas fa-cog"></i></button>
+            <button onclick="resetDailyChecklist()" title="Resetar checkboxes (novo dia)" class="icon-btn"><i class="fas fa-undo-alt"></i></button>
         </div>
         <div class="mt-3 flex flex-col sm:flex-row gap-2">
             <div class="flex-1">
@@ -324,11 +359,11 @@
         <textarea id="obs-geral" rows="3" oninput="saveObs()" class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 focus:border-emerald-500/60 outline-none text-sm resize-none" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);" placeholder="📝 Qualquer informação relevante: ocorrências, valores em caixa, chaves, alarme..."></textarea>
     </div>
 
-    <!-- NOVO: Botão de envio via WhatsApp com fotos e checklist -->
+    <!-- Botão de envio via WhatsApp (compartilhamento nativo + imagens) -->
     <div class="card-glass rounded-3xl p-5 border-2 border-emerald-500/40 bg-gradient-to-r from-emerald-500/5 to-transparent">
         <div class="flex items-center gap-3 mb-2"><i class="fab fa-whatsapp text-2xl text-green-500"></i><label class="font-bold uppercase text-xs tracking-[0.2em] text-emerald-400">Enviar checklist</label></div>
-        <p class="text-[11px] text-gray-400 mb-3">Envie o checklist via WhatsApp. O app irá gerar um resumo + imagens.</p>
-        <button id="whatsapp-share-btn" onclick="shareChecklistOnWhatsApp()" class="w-full btn-whatsapp py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-3 transition-all"><i class="fab fa-whatsapp text-xl"></i> Enviar Checklist</button>
+        <p class="text-[11px] text-gray-400 mb-3">Envie o checklist via WhatsApp. As imagens serão incluídas automaticamente (compatível com iOS/Android).</p>
+        <button id="whatsapp-share-btn" onclick="shareChecklistOnWhatsApp()" class="w-full btn-whatsapp py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-3 transition-all"><i class="fab fa-whatsapp text-xl"></i> Compartilhar Checklist</button>
         <div id="share-status-msg" class="text-[10px] text-center text-gray-400 mt-2 hidden"></div>
     </div>
 </main>
@@ -572,17 +607,17 @@
         renderPhotoPreviews();
     }
     
-    // ============= FUNÇÃO REFORMULADA: REDIRECIONAMENTO DIRETO PARA WHATSAPP APP =============
+    // ========== COMPARTILHAMENTO WHATSAPP COM IMAGENS (NATIVO) ==========
     async function shareChecklistOnWhatsApp() {
         const shareBtn = document.getElementById('whatsapp-share-btn');
         const originalHtml = shareBtn.innerHTML;
-        shareBtn.disabled = true;
-        shareBtn.innerHTML = '<span class="share-loader"></span> A abrir WhatsApp...';
         const statusDiv = document.getElementById('share-status-msg');
+        shareBtn.disabled = true;
+        shareBtn.innerHTML = '<span class="share-loader"></span> Preparando envio...';
         statusDiv.classList.add('hidden');
         
         try {
-            // montar relatório igual ao anterior
+            // Construir o texto do relatório
             const responsavel = document.getElementById('responsavel-nome').value.trim() || "Não informado";
             const dataHora = document.getElementById('data-hora').value || new Date().toLocaleString('pt-PT');
             const observacoes = document.getElementById('obs-geral').value.trim() || "Nenhuma observação adicional.";
@@ -603,44 +638,55 @@
             message += `📋 *CHECKLIST:*\n${tasksList}\n`;
             message += `📝 *Observações:* ${observacoes}\n`;
             message += `📸 *Total de fotos anexadas:* ${attachedPhotos.length}\n`;
-            message += `\n🔒 Relatório gerado automaticamente via Smash Checklist.`;
+            message += `\n🔒 Relatório gerado via Smash Checklist.`;
             
-            // Adicionar aviso sobre as fotos (já que o link direto não envia imagens automaticamente)
-            if (attachedPhotos.length > 0) {
-                message += `\n\n⚠️ *Importante:* Existem ${attachedPhotos.length} foto(s) anexadas no sistema. Por favor, envie-as manualmente após abrir o chat.`;
+            // Se há fotos e o navegador suporta compartilhamento nativo com arquivos
+            if (attachedPhotos.length > 0 && navigator.share && navigator.canShare) {
+                // Converter dataURLs para objetos File
+                const files = [];
+                for (let i = 0; i < attachedPhotos.length; i++) {
+                    const photo = attachedPhotos[i];
+                    const blob = await (await fetch(photo.dataURL)).blob();
+                    const file = new File([blob], photo.name || `foto_${i+1}.jpg`, { type: blob.type });
+                    files.push(file);
+                }
+                const shareData = {
+                    text: message,
+                    files: files
+                };
+                if (navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+                    statusDiv.innerText = "✓ Checklist e fotos enviados com sucesso!";
+                    statusDiv.classList.remove('hidden');
+                    setTimeout(() => statusDiv.classList.add('hidden'), 4000);
+                    shareBtn.disabled = false;
+                    shareBtn.innerHTML = originalHtml;
+                    return;
+                }
             }
             
+            // Fallback para deep link + aviso de fotos manuais
             const encodedMsg = encodeURIComponent(message);
-            
-            // Detectar dispositivo móvel para usar deep link direto (whatsapp://) que abre o aplicativo sem passar pelo browser
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|Windows Phone|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
             let whatsappUrl;
-            
             if (isMobile) {
-                // Deep link que força abertura direta do aplicativo WhatsApp (sem passar pelo browser)
                 whatsappUrl = `whatsapp://send?text=${encodedMsg}`;
             } else {
-                // Em desktop, usar wa.me que redireciona para WhatsApp Web ou aplicativo (se integrado)
                 whatsappUrl = `https://wa.me/?text=${encodedMsg}`;
             }
-            
-            // Redirecionar diretamente
             window.open(whatsappUrl, '_blank');
-            
-            // Pequeno delay para exibir mensagem de sucesso, mas sem bloquear
-            statusDiv.classList.remove('hidden');
             if (attachedPhotos.length > 0) {
                 statusDiv.innerText = `✓ WhatsApp aberto! Envie as ${attachedPhotos.length} foto(s) manualmente no chat.`;
             } else {
-                statusDiv.innerText = "✓ Checklist enviado! O WhatsApp foi aberto com o resumo.";
+                statusDiv.innerText = "✓ Checklist enviado! Abra o WhatsApp e cole a mensagem.";
             }
-            setTimeout(() => statusDiv.classList.add('hidden'), 5000);
-            
-        } catch (err) {
-            console.error("Erro ao abrir WhatsApp:", err);
             statusDiv.classList.remove('hidden');
-            statusDiv.innerText = "❌ Não foi possível abrir o WhatsApp. Verifique se o aplicativo está instalado.";
-            setTimeout(() => statusDiv.classList.add('hidden'), 4000);
+            setTimeout(() => statusDiv.classList.add('hidden'), 6000);
+        } catch (err) {
+            console.error("Erro ao compartilhar:", err);
+            statusDiv.innerText = "❌ Falha ao compartilhar. Tente novamente ou envie manualmente.";
+            statusDiv.classList.remove('hidden');
+            setTimeout(() => statusDiv.classList.add('hidden'), 5000);
         } finally {
             shareBtn.disabled = false;
             shareBtn.innerHTML = originalHtml;
